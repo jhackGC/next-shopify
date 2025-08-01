@@ -180,10 +180,13 @@ npm run dev
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 - `npm run type-check` - Run TypeScript checks
-- `npm run test:shopify` - Test Shopify API connectivity and configuration
-- `npm run test:quick` - Quick test for store connection (minimal setup required)
+- `npm run test:shopify` - Run complete Shopify integration test suite
+- `npm run test:quick` - Quick integration test for store connection (minimal setup required)
+- `npm run test:env` - Test environment variables configuration
+- `npm run test:storefront` - Test Storefront API integration
+- `npm run test:customer` - Test Customer Account API configuration
 
-## Testing Your Setup
+## Integration Testing
 
 ### Quick Test (Recommended for initial setup)
 
@@ -197,7 +200,7 @@ This only requires:
 - `SHOPIFY_STORE_DOMAIN`
 - `SHOPIFY_STOREFRONT_PRIVATE_ACCESS_TOKEN`
 
-### Full Integration Test
+### Complete Integration Test Suite
 
 Test your complete Shopify integration:
 
@@ -205,11 +208,23 @@ Test your complete Shopify integration:
 npm run test:shopify
 ```
 
-This will validate:
+This validates:
 - Environment variables configuration
 - Shopify Storefront API connectivity
 - Customer Account API setup
 - Next.js API routes functionality
+
+### Individual Integration Tests
+
+Run specific integration tests:
+
+```bash
+npm run test:env        # Environment variables validation
+npm run test:storefront # Storefront API connectivity
+npm run test:customer   # Customer Account API configuration
+```
+
+**Note**: These are integration tests that validate real external API connectivity and service configuration. They are located in `scripts/integration/` and test actual Shopify services, not mocked data.
 
 See [TEST-README.md](./TEST-README.md) for detailed testing information.
 
