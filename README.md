@@ -197,6 +197,7 @@ npm run test:quick
 ```
 
 This only requires:
+
 - `SHOPIFY_STORE_DOMAIN`
 - `SHOPIFY_STOREFRONT_PRIVATE_ACCESS_TOKEN`
 
@@ -209,6 +210,7 @@ npm run test:shopify
 ```
 
 This validates:
+
 - Environment variables configuration
 - Shopify Storefront API connectivity
 - Customer Account API setup

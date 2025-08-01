@@ -1,13 +1,13 @@
 import { Collection, Product } from "@/types/shopify";
 import { GraphQLClient } from "graphql-request";
 
-// Server-side Shopify client (no authentication needed for public data)
+// Server-side Shopify client using public token (private token has auth issues)
 const serverShopifyClient = new GraphQLClient(
-  `https://${process.env.SHOPIFY_STORE_DOMAIN}/api/2023-10/graphql.json`,
+  `https://${process.env.SHOPIFY_STORE_DOMAIN}/api/2025-01/graphql.json`,
   {
     headers: {
       "X-Shopify-Storefront-Access-Token":
-        process.env.SHOPIFY_STOREFRONT_PRIVATE_ACCESS_TOKEN!,
+        process.env.SHOPIFY_STOREFRONT_PUBLIC_ACCESS_TOKEN!,
       "Content-Type": "application/json",
     },
   }
