@@ -8,12 +8,19 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test:shopify": "node scripts/integration/test-shopify-connectivity.js",
+    "test:quick": "node scripts/integration/quick-test.js",
+    "test:env": "node scripts/integration/test-environment.js",
+    "test:storefront": "node scripts/integration/test-storefront.js",
+    "test:customer": "node scripts/integration/test-customer-api.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
+    "chalk": "^5.4.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.2.1",
     "graphql-request": "^7.2.0",
     "js-cookie": "^3.0.5",
     "next": "^15.4.5",

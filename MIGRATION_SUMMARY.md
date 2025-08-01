@@ -45,7 +45,7 @@ We have successfully moved all Shopify Customer Account API interactions to the 
 
 ```env
 SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
-SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_token
+SHOPIFY_STOREFRONT_PRIVATE_ACCESS_TOKEN=your_private_storefront_token
 SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID=shp_xxxxx
 SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_SECRET=your_secret_key
 SHOPIFY_CUSTOMER_ACCOUNT_API_URL=https://shopify.com/xxxxx/account/customer/api/unstable/graphql
@@ -55,10 +55,10 @@ NEXT_AUTH_SECRET=your_secure_random_string_for_jwt_signing
 #### Client-Exposed (Public Identifiers Only)
 
 ```env
-NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
-NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_token
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
+
+**Note**: All Shopify credentials are now server-side only.
 
 ### ✅ Build Status
 

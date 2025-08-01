@@ -7,7 +7,7 @@ const serverShopifyClient = new GraphQLClient(
   {
     headers: {
       "X-Shopify-Storefront-Access-Token":
-        process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN!,
+        process.env.SHOPIFY_STOREFRONT_PRIVATE_ACCESS_TOKEN!,
       "Content-Type": "application/json",
     },
   }

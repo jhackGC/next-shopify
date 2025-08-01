@@ -28,6 +28,14 @@ A modern e-commerce application built with Next.js 15 and Shopify Storefront API
 
 - **Next.js 15**: Latest Next.js features including App Router
 - **TypeScript**: Full type safety and better developer experience
+- **Server-Side Rendering**: Optimized data fetching and SEO
+- **Image Optimization**: Automatic image optimization and lazy loading
+
+### 🧪 Testing
+
+- **Connectivity Tests**: Built-in script to test Shopify API connectivity
+- **Environment Validation**: Automatic validation of configuration
+- **Integration Testing**: Test all API endpoints and authentication flows
 - **Tailwind CSS**: Utility-first CSS framework for fast styling
 - **Image Optimization**: Next.js Image component for optimized images
 
@@ -84,7 +92,7 @@ src/
 ```env
 # Shopify Storefront API
 NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
-NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_access_token
+SHOPIFY_STOREFRONT_PRIVATE_ACCESS_TOKEN=your_private_storefront_access_token
 
 # Shopify Customer Account API
 NEXT_PUBLIC_SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID=your_customer_api_client_id
@@ -172,6 +180,38 @@ npm run dev
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 - `npm run type-check` - Run TypeScript checks
+- `npm run test:shopify` - Test Shopify API connectivity and configuration
+- `npm run test:quick` - Quick test for store connection (minimal setup required)
+
+## Testing Your Setup
+
+### Quick Test (Recommended for initial setup)
+
+Test just your store connection with minimal configuration:
+
+```bash
+npm run test:quick
+```
+
+This only requires:
+- `SHOPIFY_STORE_DOMAIN`
+- `SHOPIFY_STOREFRONT_PRIVATE_ACCESS_TOKEN`
+
+### Full Integration Test
+
+Test your complete Shopify integration:
+
+```bash
+npm run test:shopify
+```
+
+This will validate:
+- Environment variables configuration
+- Shopify Storefront API connectivity
+- Customer Account API setup
+- Next.js API routes functionality
+
+See [TEST-README.md](./TEST-README.md) for detailed testing information.
 
 ## Deployment
 

@@ -170,19 +170,18 @@ The application uses two sets of environment variables:
 
 ```env
 SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
-SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_token
+SHOPIFY_STOREFRONT_PRIVATE_ACCESS_TOKEN=your_private_storefront_token
 SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID=your_client_id
 SHOPIFY_CUSTOMER_ACCOUNT_API_URL=https://shopify.com/your-api-url
 ```
 
-**Client-side (exposed to browser with NEXT*PUBLIC* prefix):**
+**Client-side (only safe public configs):**
 
 ```env
-NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
-NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_token
-NEXT_PUBLIC_SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID=your_client_id
-NEXT_PUBLIC_SHOPIFY_CUSTOMER_ACCOUNT_API_URL=https://shopify.com/your-api-url
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
+
+**Note**: All Shopify credentials are now server-side only for enhanced security.
 
 **Security Note:**
 

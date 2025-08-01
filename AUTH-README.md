@@ -567,7 +567,7 @@ These variables contain sensitive information and are only accessible on the ser
 ```env
 # Shopify Store Configuration (Server)
 SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
-SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_token
+SHOPIFY_STOREFRONT_PRIVATE_ACCESS_TOKEN=your_private_storefront_token
 
 # Customer Account API (Server-Only)
 SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID=shp_xxxxx
@@ -584,10 +584,10 @@ These variables are safe to expose to the client as they contain only public ide
 
 ```env
 # Application Configuration (Client-Safe)
-NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
-NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_token
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
+
+**Note**: All Shopify credentials are now server-side only for enhanced security.
 
 ### Shopify Partner Dashboard Configuration
 

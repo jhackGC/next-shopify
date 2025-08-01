@@ -2,11 +2,11 @@
 
 ## Overview
 
-This Next.js application has been **completely migrated to server-side Shopify API access**. All Shopify operations (Customer Account API and Storefront API) now happen on the server for maximum security and zero credential exposure to the client.
+This Next.js application has been **setup to have server-side Shopify API access**. All Shopify operations (Customer Account API and Storefront API) now happen on the server for maximum security and zero credential exposure to the client.
 
 ## 🔒 Security Architecture
 
-### Complete Server-Side Migration
+### Complete Server-Side
 
 - **✅ Customer Account API**: Server-side only with HTTP-only cookies
 - **✅ Storefront API**: Server-side only through API routes
@@ -35,12 +35,23 @@ This Next.js application has been **completely migrated to server-side Shopify A
 
 ## 📝 Environment Variables
 
+### ⚠️ Important: Shopify Token Types
+
+**Use the PRIVATE Storefront Access Token** for server-side implementations:
+
+- Go to: Shopify Admin → Apps → Manage private apps → Headless app → Storefront API access tokens
+- Use the **Private access token** (not the public one)
+- This token has more permissions and is designed for server-side use
+- Never expose this token to the client (which we don't in this architecture!)
+
 ### Server-Only (Secure)
 
 ```bash
 # All Shopify credentials are server-side only
 SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
-SHOPIFY_STOREFRONT_ACCESS_TOKEN=your_storefront_token
+# Use the PRIVATE Storefront Access Token from Shopify headless settings
+# (NOT the public token - this is for server-side use only)
+SHOPIFY_STOREFRONT_PRIVATE_ACCESS_TOKEN=your_private_storefront_token
 
 # Customer Account API
 SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID=your_client_id
