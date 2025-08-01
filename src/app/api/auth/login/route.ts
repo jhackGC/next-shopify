@@ -13,7 +13,12 @@ export async function GET() {
     );
     authUrl.searchParams.append("scope", SERVER_CUSTOMER_CONFIG.scopes);
     authUrl.searchParams.append("response_type", "code");
-
+    authUrl.searchParams.append("state", "random_state_string"); // Use a secure random state in production
+    authUrl.searchParams.append(
+      "nonce",
+      Math.random().toString(36).substring(2, 15) // Generate a random nonce
+    );
+    console.log("### Auth URL with params:", authUrl.toString());
     // Redirect to Shopify auth
     return NextResponse.redirect(authUrl.toString());
   } catch (error) {

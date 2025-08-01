@@ -13,7 +13,8 @@
     "test:quick": "node scripts/integration/quick-test.js",
     "test:env": "node scripts/integration/test-environment.js",
     "test:storefront": "node scripts/integration/test-storefront.js",
-    "test:customer": "node scripts/integration/test-customer-api.js"
+    "test:customer": "node scripts/integration/test-customer-api.js",
+    "ngrok": "ngrok http 3000 --domain polished-sponge-finally.ngrok-free.app"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",

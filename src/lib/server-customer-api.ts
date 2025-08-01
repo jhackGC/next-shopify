@@ -22,20 +22,14 @@ export const SERVER_CUSTOMER_CONFIG = {
   clientId,
   clientSecret: process.env.SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_SECRET!, // Now we can use a secret!
   apiUrl,
-  redirectUri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`,
-
-  scopes: [
-    "openid",
-    "email",
-    "profile",
-    "customer-account-api:read",
-    "customer-account-api:write",
-  ].join(" "),
+  //   redirectUri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`,
+  redirectUri: `https://polished-sponge-finally.ngrok-free.app/auth/callback`,
+  scopes: ["openid", "email", "customer-account-api:full"].join(" "),
 
   authUrls: {
-    authorize: `https://shopify.com/authentication/${shopId}/oauth/authorize`,
-    token: `https://${process.env.SHOPIFY_STORE_DOMAIN}/account/customer/api/auth/oauth/token`,
-    logout: `https://${process.env.SHOPIFY_STORE_DOMAIN}/account/customer/api/auth/logout`,
+    authorize: `https://account.shiftgreenhub.com.au/authentication/oauth/authorize`,
+    token: `https://account.shiftgreenhub.com.au/authentication/oauth/token`,
+    logout: `https://account.shiftgreenhub.com.au/authentication/logout`,
   },
 } as const;
 
