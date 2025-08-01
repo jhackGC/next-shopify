@@ -33,7 +33,7 @@ export const SERVER_CUSTOMER_CONFIG = {
   ].join(" "),
 
   authUrls: {
-    authorize: `https://${process.env.SHOPIFY_STORE_DOMAIN}/account/customer/api/auth/oauth/authorize`,
+    authorize: `https://shopify.com/authentication/${shopId}/oauth/authorize`,
     token: `https://${process.env.SHOPIFY_STORE_DOMAIN}/account/customer/api/auth/oauth/token`,
     logout: `https://${process.env.SHOPIFY_STORE_DOMAIN}/account/customer/api/auth/logout`,
   },
@@ -84,21 +84,30 @@ export async function getCustomerFromSession(): Promise<Customer | null> {
 }
 
 // Exchange authorization code for access token (server-side)
-export async function exchangeCodeForToken(code: string, codeVerifier: string) {
+export async function exchangeCodeForToken(
+  code: string,
+  codeVerifier?: string
+) {
   try {
+    const body = new URLSearchParams({
+      grant_type: "authorization_code",
+      client_id: SERVER_CUSTOMER_CONFIG.clientId,
+      client_secret: SERVER_CUSTOMER_CONFIG.clientSecret,
+      code,
+      redirect_uri: SERVER_CUSTOMER_CONFIG.redirectUri,
+    });
+
+    // Only add code_verifier if provided (for PKCE flow)
+    if (codeVerifier) {
+      body.append("code_verifier", codeVerifier);
+    }
+
     const tokenResponse = await fetch(SERVER_CUSTOMER_CONFIG.authUrls.token, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: new URLSearchParams({
-        grant_type: "authorization_code",
-        client_id: SERVER_CUSTOMER_CONFIG.clientId,
-        client_secret: SERVER_CUSTOMER_CONFIG.clientSecret,
-        code,
-        code_verifier: codeVerifier,
-        redirect_uri: SERVER_CUSTOMER_CONFIG.redirectUri,
-      }),
+      body,
     });
 
     if (!tokenResponse.ok) {

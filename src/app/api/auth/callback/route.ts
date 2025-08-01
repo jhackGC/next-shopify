@@ -14,34 +14,20 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get the stored code verifier
-    const cookieStore = await cookies();
-    const codeVerifier = cookieStore.get("pkce_code_verifier")?.value;
-
-    if (!codeVerifier) {
-      return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}?error=no_verifier`
-      );
-    }
-
-    // Exchange code for token
-    const tokenData = await exchangeCodeForToken(code, codeVerifier);
+    // Exchange code for token (no code verifier needed for confidential clients)
+    const tokenData = await exchangeCodeForToken(code);
 
     // Store access token in secure cookie
+    const cookieStore = await cookies();
     cookieStore.set("shopify_customer_token", tokenData.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: tokenData.expires_in || 3600, // Use token expiry or default to 1 hour
+      maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
-    // Clean up the code verifier
-    cookieStore.delete("pkce_code_verifier");
-
-    // Redirect back to app
-    return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}?auth=success`
-    );
+    // Redirect to success page or dashboard
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/account`);
   } catch (error) {
     console.error("Auth callback error:", error);
     return NextResponse.redirect(
