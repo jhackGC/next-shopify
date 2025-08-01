@@ -13,10 +13,15 @@ const customerAccountClient = new GraphQLClient(
 );
 
 // Configuration for Customer Account API (server-side only)
+const clientId = process.env.SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID!;
+// Extract shop ID from the API URL instead of the client ID
+const apiUrl = process.env.SHOPIFY_CUSTOMER_ACCOUNT_API_URL!;
+const shopId = apiUrl.match(/shopify\.com\/([^\/]+)\//)?.[1] || "";
+
 export const SERVER_CUSTOMER_CONFIG = {
-  clientId: process.env.SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID!,
+  clientId,
   clientSecret: process.env.SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_SECRET!, // Now we can use a secret!
-  apiUrl: process.env.SHOPIFY_CUSTOMER_ACCOUNT_API_URL!,
+  apiUrl,
   redirectUri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`,
 
   scopes: [
@@ -28,9 +33,9 @@ export const SERVER_CUSTOMER_CONFIG = {
   ].join(" "),
 
   authUrls: {
-    authorize: `https://shopify.com/${process.env.SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID}/auth/oauth/authorize`,
-    token: `https://shopify.com/${process.env.SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID}/auth/oauth/token`,
-    logout: `https://shopify.com/${process.env.SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID}/auth/logout`,
+    authorize: `https://${process.env.SHOPIFY_STORE_DOMAIN}/account/customer/api/auth/oauth/authorize`,
+    token: `https://${process.env.SHOPIFY_STORE_DOMAIN}/account/customer/api/auth/oauth/token`,
+    logout: `https://${process.env.SHOPIFY_STORE_DOMAIN}/account/customer/api/auth/logout`,
   },
 } as const;
 
