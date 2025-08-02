@@ -12,7 +12,7 @@ export function Header() {
   const { totalQuantity } = useCart();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-
+  console.log("### Header - Customer:", customer);
   const handleLogout = async () => {
     try {
       await logout();

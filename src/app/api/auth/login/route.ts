@@ -5,7 +5,6 @@ export async function GET() {
   try {
     // Build authorization URL (no PKCE needed for confidential clients)
     const authUrl = new URL(SERVER_CUSTOMER_CONFIG.authUrls.authorize);
-    console.log("### Auth URL:", authUrl.toString());
     authUrl.searchParams.append("client_id", SERVER_CUSTOMER_CONFIG.clientId);
     authUrl.searchParams.append(
       "redirect_uri",
@@ -18,7 +17,6 @@ export async function GET() {
       "nonce",
       Math.random().toString(36).substring(2, 15) // Generate a random nonce
     );
-    console.log("### Auth URL with params:", authUrl.toString());
     // Redirect to Shopify auth
     return NextResponse.redirect(authUrl.toString());
   } catch (error) {

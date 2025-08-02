@@ -22,8 +22,7 @@ export const SERVER_CUSTOMER_CONFIG = {
   clientId,
   clientSecret: process.env.SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_SECRET!, // Now we can use a secret!
   apiUrl,
-  //   redirectUri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`,
-  redirectUri: `https://polished-sponge-finally.ngrok-free.app/auth/callback`,
+  redirectUri: `https://polished-sponge-finally.ngrok-free.app/api/auth/callback`,
   scopes: ["openid", "email", "customer-account-api:full"].join(" "),
 
   authUrls: {
@@ -37,6 +36,7 @@ export const SERVER_CUSTOMER_CONFIG = {
 export async function getCustomerFromSession(): Promise<Customer | null> {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("shopify_customer_token")?.value;
+  console.log("### Access Token:", accessToken);
 
   if (!accessToken) {
     return null;

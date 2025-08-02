@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
+    console.log("### Get Customer Info");
     const customer = await getCustomerFromSession();
 
     if (!customer) {

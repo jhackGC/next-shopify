@@ -3,10 +3,15 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
+  console.log("### Auth Callback ...");
+
   try {
     const { searchParams } = new URL(request.url);
     const code = searchParams.get("code");
     const state = searchParams.get("state");
+
+    // console.log("### Auth Callback - Code:", code);
+    // console.log("### Auth Callback - State:", state);
 
     if (!code) {
       return NextResponse.redirect(
@@ -16,6 +21,7 @@ export async function GET(request: NextRequest) {
 
     // Exchange code for token (no code verifier needed for confidential clients)
     const tokenData = await exchangeCodeForToken(code);
+    console.log("### Auth Callback - tokenData:", tokenData);
 
     // Store access token in secure cookie
     const cookieStore = await cookies();
