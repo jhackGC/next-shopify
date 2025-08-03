@@ -1,0 +1,11 @@
+{
+  "shopId": 65977352364,
+  "cid": "shp_e09146b1-cb7e-4538-bc92-ec481dca9105",
+  "iat": 1754197703,
+  "exp": 1754201303,
+  "iss": "https://shopify.com/authentication/65977352364",
+  "sub": 7825766514860,
+  "scope": "openid email customer-account-api:full",
+  "rtid": "01986e54-bb8d-ec0c-b37d-3a8c0f3dabd3",
+  "sid": "01K1Q59DRFA9SB0RTYMWRNQHC4"
+}

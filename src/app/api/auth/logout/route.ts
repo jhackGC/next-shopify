@@ -1,14 +1,22 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import {
+  cleanAllAuthCookies,
+  getLogoutUrl,
+} from "../../../../lib/server-customer-api";
 
-export async function POST() {
+export async function GET() {
+  console.log("### GET Logout - clearing cookies and redirecting ...");
   try {
-    const cookieStore = await cookies();
+    const logoutUrl = await getLogoutUrl();
 
-    // Clear the customer token
-    cookieStore.delete("shopify_customer_token");
+    cleanAllAuthCookies();
 
-    return NextResponse.json({ success: true });
+    console.log("### cleared cookies - about to logout from Shopify");
+
+    console.log("### Redirecting to logout URL:", logoutUrl);
+    // logout from shopify
+    // Redirect to logout URL, it will return to the redirect
+    return NextResponse.redirect(logoutUrl);
   } catch (error) {
     console.error("Logout error:", error);
     return NextResponse.json({ error: "Logout failed" }, { status: 500 });
