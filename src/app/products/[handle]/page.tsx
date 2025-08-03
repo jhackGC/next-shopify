@@ -3,12 +3,61 @@ import { formatMoney } from "@/lib/utils";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getProductByHandle } from "../../../lib/shopify-storefront-api/server-shopify-storefront-api";
+import {
+  getCollectionProducts,
+  getProductByHandle,
+} from "../../../lib/shopify-storefront-api/server-shopify-storefront-api";
+import { STATIC_GENERATION_CONFIG } from "../../../util/ssrHelper";
 
 interface ProductPageProps {
   params: Promise<{
     handle: string;
   }>;
+}
+
+// Generate static params for products from specific collections
+export async function generateStaticParams() {
+  // Skip static generation in development for faster builds
+  if (!STATIC_GENERATION_CONFIG.ENABLE_STATIC_GENERATION) {
+    console.log("⏩ Skipping static generation in development");
+    return [];
+  }
+
+  try {
+    const allParams: Array<{ handle: string }> = [];
+
+    // Generate for multiple collections
+    for (const collectionHandle of STATIC_GENERATION_CONFIG.COLLECTIONS_TO_PREGENERATE) {
+      console.log(
+        `🔨 Building static pages for collection: ${collectionHandle}`
+      );
+
+      const products = await getCollectionProducts(
+        collectionHandle,
+        STATIC_GENERATION_CONFIG.MAX_PRODUCTS_PER_COLLECTION
+      );
+
+      const collectionParams = products.map((product) => ({
+        handle: product.handle,
+      }));
+
+      allParams.push(...collectionParams);
+      console.log(
+        `📦 Added ${collectionParams.length} products from ${collectionHandle}`
+      );
+
+      products.forEach((product) => {
+        console.log("### Product pre-rendered:", product.title);
+      });
+    }
+
+    console.log(`🚀 Total pre-generating ${allParams.length} product pages...`);
+
+    return allParams;
+  } catch (error) {
+    console.error("❌ Error generating static params:", error);
+    return [];
+  }
 }
 
 // Generate metadata for SEO
@@ -42,8 +91,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
   if (!product) {
     notFound();
   }
-
-  console.log("### Product data:", product);
 
   const firstVariant = product.variants.edges[0]?.node;
   const hasMultipleVariants = product.variants.edges.length > 1;
