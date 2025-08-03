@@ -1,4 +1,4 @@
-import { getProductFragment } from '../fragments/product';
+import { getProductFragment } from "../fragments/product";
 
 export const getProductQuery = (admin: boolean) => {
   /* GraphQL */
@@ -46,7 +46,6 @@ export const getProductsQuery = (admin: boolean) => {
 export const getProductsByHandleQuery = (admin: boolean) => {
   /* GraphQL */
 
-  console.log('### getProductsByHandleQuery admin', admin);
   if (admin) {
     return `
       query getProductsByHandleQuery($identifier: ProductIdentifierInput!) {

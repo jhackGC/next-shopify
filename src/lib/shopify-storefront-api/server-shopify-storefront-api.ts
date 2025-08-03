@@ -1,5 +1,6 @@
 import { Collection, Product } from "@/types/shopify";
 import { GraphQLClient } from "graphql-request";
+import { collectionProductsQuery } from "./queries/collection";
 
 // Server-side Shopify client using public token (private token has auth issues)
 const getStorefrontClient = () => {
@@ -191,59 +192,17 @@ export async function getFeaturedCollections(
 }
 
 // Get products from a specific collection
+// If you dont get any products back, check:
+// 1. The collection handle is correct
+// 2. The collection has products assigned to it
+// 3. The products are published on the sales channel (your headless store app)
+// 4. Make sure the product status is "Active" (not Draft)
 export async function getCollectionProducts(
   handle: string,
-  first: number = 30
+  first: number = 250
 ): Promise<Product[]> {
   try {
-    // const query = `
-    //   query GetCollectionProducts($handle: String!) {
-    //     collection(handle: $handle) {
-    //       id
-    //       title
-    //       products(first: 20) {
-    //         edges {
-    //           node {
-    //             id
-    //             title
-    //             handle
-    //             featuredImage {
-    //               id
-    //               url
-    //               altText
-    //               width
-    //               height
-    //             }
-    //             priceRange {
-    //               minVariantPrice {
-    //                 amount
-    //                 currencyCode
-    //               }
-    //             }
-    //           }
-    //         }
-    //       }
-    //     }
-    //   }
-    // `;
-
-    const query = `
-      query GetCollectionProducts($handle: String!) {
-        collection(handle: $handle) {
-          id
-          title
-          products(first: 20) {
-            edges {
-              node {
-                id
-                title
-                handle
-              }
-            }
-          }
-        }
-      }
-    `;
+    const query = collectionProductsQuery;
 
     const response = await getStorefrontClient().request<{
       collection: Collection | null;

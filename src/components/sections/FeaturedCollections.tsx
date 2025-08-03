@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getFeaturedCollections } from "../../lib/shopify-storefront/server-shopify-storefront-api";
+import { getFeaturedCollections } from "../../lib/shopify-storefront-api/server-shopify-storefront-api";
 
 // Helper function to format price
 function formatPrice(amount: number, currencyCode: string): string {

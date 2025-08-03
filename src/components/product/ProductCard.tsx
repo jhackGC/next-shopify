@@ -11,7 +11,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, className = "" }: ProductCardProps) {
   const featuredImage = product.featuredImage?.url;
-  const price = product.priceRange.minVariantPrice;
+  const price = product.priceRange?.minVariantPrice;
   const compareAtPrice = product.compareAtPriceRange?.minVariantPrice;
   const isOnSale =
     compareAtPrice &&

@@ -1,9 +1,9 @@
 import { ProductCard } from "@/components/product/ProductCard";
-import { getCollectionProducts } from "../../lib/shopify-storefront/server-shopify-storefront-api";
+import { getCollectionProducts } from "../../lib/shopify-storefront-api/server-shopify-storefront-api";
 
 export default async function FeaturedProducts() {
   const products = await getCollectionProducts("buy-now");
-  console.log("Featured Products:", products);
+  console.log("Featured Products:", products.length);
 
   if (products.length === 0) {
     return (

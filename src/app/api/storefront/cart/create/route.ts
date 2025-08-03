@@ -1,7 +1,7 @@
 import { CREATE_CART } from "@/lib/queries";
 import type { Cart, CartLineInput } from "@/types/shopify";
 import { NextRequest, NextResponse } from "next/server";
-import { storefrontClient } from "../../../../../lib/shopify-storefront/server-shopify-storefront-api";
+import { storefrontClient } from "../../../../../lib/shopify-storefront-api/server-shopify-storefront-api";
 
 interface CreateCartResponse {
   cartCreate: {

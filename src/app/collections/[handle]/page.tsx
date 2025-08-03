@@ -2,7 +2,7 @@ import { ProductCard } from "@/components/product/ProductCard";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getCollectionByHandle } from "../../../lib/shopify-storefront/server-shopify-storefront-api";
+import { getCollectionByHandle } from "../../../lib/shopify-storefront-api/server-shopify-storefront-api";
 
 interface CollectionPageProps {
   params: Promise<{

@@ -2,8 +2,8 @@ import {
   getProductFragment,
   productFragmentForCard,
   productFragmentHandleOnly,
-} from '../fragments/product';
-import seoFragment from '../fragments/seo';
+} from "../fragments/product";
+import seoFragment from "../fragments/seo";
 
 export const collectionFragment = /* GraphQL */ `
   fragment collection on Collection {
@@ -84,28 +84,10 @@ export const getShopDataQuery = /* GraphQL */ `
   }
 `;
 
-// export const getCollectionProductsQuery = /* GraphQL */ `
-//   query getCollectionProducts(
-//     $handle: String!
-//     $sortKey: ProductCollectionSortKeys
-//     $reverse: Boolean
-//   ) {
-//     collection(handle: $handle) {
-//       products(sortKey: $sortKey, reverse: $reverse, first: 100) {
-//         edges {
-//           node {
-//             ...product
-//           }
-//         }
-//       }
-//     }
-//   }
-//   ${productFragment}
-// `;
-
-export const getCollectionProductsQuery = /* GraphQL */ `
+export const collectionProductsQuery = /* GraphQL */ `
   query getCollectionProducts(
     $handle: String!
+    $first: Int = 250
     $sortKey: ProductCollectionSortKeys
     $reverse: Boolean
     $startCursor: String
@@ -115,7 +97,7 @@ export const getCollectionProductsQuery = /* GraphQL */ `
         sortKey: $sortKey
         reverse: $reverse
         after: $startCursor
-        first: 250
+        first: $first
       ) {
         edges {
           node {

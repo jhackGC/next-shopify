@@ -3,7 +3,7 @@ import { formatMoney } from "@/lib/utils";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getProductByHandle } from "../../../lib/shopify-storefront/server-shopify-storefront-api";
+import { getProductByHandle } from "../../../lib/shopify-storefront-api/server-shopify-storefront-api";
 
 interface ProductPageProps {
   params: Promise<{
