@@ -11,14 +11,20 @@ interface TokenReturn {
 }
 
 // Server-side Customer Account API client
-const customerAccountClient = new GraphQLClient(
-  process.env.SHOPIFY_CUSTOMER_ACCOUNT_API_URL!,
-  {
+const getCustomerAccountClient = async () => {
+  const accessToken = (await cookies()).get("access_token")?.value;
+  //   console.log("### Access To`ken:", accessToken?.substring(0, 6) + "...");
+  const customerApiUrl = process.env.SHOPIFY_CUSTOMER_ACCOUNT_API_URL;
+  if (!customerApiUrl) {
+    throw new Error("SHOPIFY_CUSTOMER_ACCOUNT_API_URL is not set");
+  }
+  return new GraphQLClient(customerApiUrl, {
     headers: {
       "Content-Type": "application/json",
+      Authorization: `${accessToken}`, // according to the docs, this does not need to be prefixed with "Bearer"
     },
-  }
-);
+  });
+};
 
 // Configuration for Customer Account API (server-side only)
 const clientId = process.env.SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID!;
@@ -86,70 +92,33 @@ export async function getCustomerFromSession(): Promise<Customer | null> {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access_token")?.value;
   console.log("### Access Token:", accessToken?.substring(0, 20) + "...");
+  console.log("### Access Token:", accessToken);
 
   if (!accessToken) {
     return null;
   }
 
   try {
-    // const authenticatedClient = new GraphQLClient(
-    //   SERVER_CUSTOMER_CONFIG.apiUrl,
-    //   {
-    //     headers: {
-    //       Authorization: `${accessToken}`,
-    //       "Content-Type": "application/json",
-    //     },
-    //   }
-    // );
+    // simple query
+    console.log("### Testing authentication with simple query...");
+    const customerAccountClient = await getCustomerAccountClient();
 
-    try {
-      // simple query
-      console.log("### Testing authentication with simple query...");
-
-      const response = await fetch(
-        "https://shopify.com/65977352364/account/customer/api/2025-07/graphql",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `${accessToken}`,
-          },
-          body: JSON.stringify({
-            operationName: "SomeQuery",
-            query: "query { customer { emailAddress { emailAddress }}}",
-            variables: {},
-          }),
+    const query = `
+      query GetCustomer {
+        customer {
+          emailAddress {
+            emailAddress
+          }
         }
-      );
-
-      // process the success response
-      if (response.status === 200) {
-        const data = await response.json();
-        console.log("### Simple query successful:", data.customer);
       }
-    } catch (testError) {
-      console.log("### Simple query failed:", testError);
-    }
+    `;
 
-    // const query = `
-    //   query GetCustomer {
-    //     customer {
-    //       id
-    //       email
-    //       firstName
-    //       lastName
-    //       phone
-    //       createdAt
-    //       updatedAt
-    //     }
-    //   }
-    // `;
+    const response = await customerAccountClient.request<{
+      customer: Customer;
+    }>(query);
 
-    // const response = await authenticatedClient.request<{ customer: Customer }>(
-    //   query
-    // );
-    // return response.customer;
-    return null;
+    console.log("### Customer fetched successfully:", response.customer);
+    return response.customer;
   } catch (error) {
     console.error("Error fetching customer:", error);
 
