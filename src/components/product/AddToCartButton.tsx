@@ -19,20 +19,27 @@ export function AddToCartButton({
   const { addToCart } = useCart();
 
   const handleAddToCart = async () => {
+    console.log("AddToCartButton: Adding to cart", { variant });
     if (disabled || isAdding) return;
 
     setIsAdding(true);
     try {
-      await addToCart([
+      const result = await addToCart([
         {
           merchandiseId: variant.id,
           quantity: 1,
         },
       ]);
+      if (!result) {
+        console.error("AddToCartButton: No cart returned from addToCart");
+      }
       // You could add a toast notification here
-    } catch (error) {
-      console.error("Failed to add to cart:", error);
-      // You could add an error toast here
+    } catch (error: any) {
+      console.error("AddToCartButton: Exception thrown:", error);
+      if (error && error.message) {
+        // Surface error message for debugging
+        window.alert(`Add to cart failed: ${error.message}`);
+      }
     } finally {
       setIsAdding(false);
     }
@@ -42,12 +49,12 @@ export function AddToCartButton({
     <button
       onClick={handleAddToCart}
       disabled={disabled || isAdding}
-      className={`
-        w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium
-        hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed
-        transition-colors duration-200 flex items-center justify-center
-        ${className}
-      `}
+      className={[
+        "w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium",
+        "hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed",
+        "transition-colors duration-200 flex items-center justify-center",
+        className,
+      ].join(" ")}
     >
       {isAdding ? (
         <>

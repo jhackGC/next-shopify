@@ -14,11 +14,11 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { lines }: { lines?: CartLineInput[] } = body;
-
+    console.log("Creating cart with lines:", lines);
     const response = await storefrontClient.request<CreateCartResponse>(
       CREATE_CART,
       {
-        cartInput: {
+        input: {
           lines: lines || [],
         },
       }

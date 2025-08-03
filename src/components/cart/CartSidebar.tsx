@@ -160,7 +160,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                                     </Link>
                                   </h3>
                                   <p className="ml-4">
-                                    {formatMoney(lineItem.cost.totalAmount)}
+                                    {formatMoney(lineItem?.cost?.totalAmount)}
                                   </p>
                                 </div>
                                 {merchandise.title !== "Default Title" && (
