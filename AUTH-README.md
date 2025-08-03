@@ -61,7 +61,7 @@ All customer tokens are stored in secure HTTP-only cookies that cannot be access
 ```typescript
 export async function getCustomerFromSession(): Promise<Customer | null> {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get("shopify_customer_token")?.value;
+  const accessToken = cookieStore.get("access_token")?.value;
 
   if (!accessToken) {
     return null;
@@ -176,7 +176,7 @@ async function handleCallback(code: string, state: string): Promise<void> {
   const tokenResponse = await exchangeCodeForToken(code, storedCodeVerifier);
 
   // Store token in secure HTTP-only cookie
-  cookies().set("shopify_customer_token", tokenResponse.access_token, {
+  cookies().set("access_token", tokenResponse.access_token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
@@ -255,7 +255,7 @@ export async function GET(request: NextRequest) {
 
     // Set secure HTTP-only cookie
     const response = NextResponse.redirect(new URL("/", request.url));
-    response.cookies.set("shopify_customer_token", tokenData.access_token, {
+    response.cookies.set("access_token", tokenData.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -302,7 +302,7 @@ Clears the authentication cookie and terminates the session.
 export async function POST() {
   try {
     const response = Response.json({ success: true });
-    response.cookies.delete("shopify_customer_token");
+    response.cookies.delete("access_token");
     return response;
   } catch (error) {
     return Response.json({ error: "Failed to logout" }, { status: 500 });
@@ -409,7 +409,7 @@ if (state !== storedState) {
 Tokens are stored in HTTP-only cookies that cannot be accessed by client-side JavaScript.
 
 ```typescript
-response.cookies.set("shopify_customer_token", accessToken, {
+response.cookies.set("access_token", accessToken, {
   httpOnly: true, // Cannot be accessed by JavaScript
   secure: process.env.NODE_ENV === "production", // HTTPS only in production
   sameSite: "lax", // CSRF protection
@@ -436,7 +436,7 @@ Server-side token validation for every authenticated request.
 ```typescript
 export async function getCustomerFromSession(): Promise<Customer | null> {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get("shopify_customer_token")?.value;
+  const accessToken = cookieStore.get("access_token")?.value;
 
   if (!accessToken) {
     return null;
@@ -645,7 +645,7 @@ export async function GET() {
 // Environment-aware security settings
 const isProduction = process.env.NODE_ENV === "production";
 
-response.cookies.set("shopify_customer_token", token, {
+response.cookies.set("access_token", token, {
   httpOnly: true,
   secure: isProduction, // HTTPS only in production
   sameSite: "lax",

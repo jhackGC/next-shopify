@@ -47,12 +47,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      const response = await fetch("/api/auth/logout");
+      // Clear local state first
+      setIsAuthenticated(false);
+      setCustomer(null);
 
-      if (response.ok) {
-        setIsAuthenticated(false);
-        setCustomer(null);
-      }
+      // Redirect to logout endpoint which will handle cookie cleanup and Shopify logout
+      window.location.href = "/api/auth/logout";
     } catch (error) {
       console.error("Logout error:", error);
     }

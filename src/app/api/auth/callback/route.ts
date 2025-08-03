@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     );
 
     // Set cookie with appropriate settings
-    cookieStore.set("shopify_customer_token", tokenData.access_token, {
+    cookieStore.set("access_token", tokenData.access_token, {
       httpOnly: true,
       secure: true,
       sameSite: "lax",
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Verify cookie was set
-    const savedToken = cookieStore.get("shopify_customer_token")?.value;
+    const savedToken = cookieStore.get("access_token")?.value;
     console.log(
       "### Cookie verification:",
       savedToken ? "COOKIE_SET" : "COOKIE_NOT_SET"

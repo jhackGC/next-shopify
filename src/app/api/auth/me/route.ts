@@ -18,9 +18,9 @@ export async function GET() {
 
     // Debug: Log the actual cookie values (first 50 chars)
     allCookies.forEach((cookie) => {
-      if (cookie.name === "shopify_customer_token") {
+      if (cookie.name === "access_token") {
         console.log(
-          "### FOUND shopify_customer_token cookie value (first 50 chars):",
+          "### FOUND access_token cookie value (first 50 chars):",
           cookie.value?.substring(0, 50)
         );
         console.log("### Full cookie length:", cookie.value?.length);
@@ -28,9 +28,9 @@ export async function GET() {
     });
 
     // Specifically check for our token
-    const tokenCookie = cookieStore.get("shopify_customer_token");
+    const tokenCookie = cookieStore.get("access_token");
     console.log(
-      "### shopify_customer_token cookie:",
+      "### access_token cookie:",
       tokenCookie ? "FOUND" : "NOT_FOUND"
     );
 

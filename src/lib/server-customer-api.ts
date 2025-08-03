@@ -84,74 +84,72 @@ export const SERVER_CUSTOMER_CONFIG = {
 // Server-side authentication functions
 export async function getCustomerFromSession(): Promise<Customer | null> {
   const cookieStore = await cookies();
-  const accessToken = cookieStore.get("shopify_customer_token")?.value;
-  console.log("### Access Token:", accessToken);
+  const accessToken = cookieStore.get("access_token")?.value;
+  console.log("### Access Token:", accessToken?.substring(0, 20) + "...");
 
   if (!accessToken) {
     return null;
   }
 
   try {
-    console.log("### GraphQL API URL:", SERVER_CUSTOMER_CONFIG.apiUrl);
-    console.log(
-      "### Access Token (first 20 chars):",
-      accessToken?.substring(0, 20) + "..."
-    );
-
-    const authenticatedClient = new GraphQLClient(
-      SERVER_CUSTOMER_CONFIG.apiUrl,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      }
-    );
-
-    console.log(
-      "### Authorization header:",
-      `Bearer ${accessToken?.substring(0, 20)}...`
-    );
-
-    // First try a simple introspection query to test authentication
-    const testQuery = `
-      query {
-        __schema {
-          queryType {
-            name
-          }
-        }
-      }
-    `;
-
-    console.log("### Testing authentication with introspection query...");
+    // const authenticatedClient = new GraphQLClient(
+    //   SERVER_CUSTOMER_CONFIG.apiUrl,
+    //   {
+    //     headers: {
+    //       Authorization: `${accessToken}`,
+    //       "Content-Type": "application/json",
+    //     },
+    //   }
+    // );
 
     try {
-      const testResponse = await authenticatedClient.request(testQuery);
-      console.log("### Introspection successful:", testResponse);
+      // simple query
+      console.log("### Testing authentication with simple query...");
+
+      const response = await fetch(
+        "https://shopify.com/65977352364/account/customer/api/2025-07/graphql",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `${accessToken}`,
+          },
+          body: JSON.stringify({
+            operationName: "SomeQuery",
+            query: "query { customer { emailAddress { emailAddress }}}",
+            variables: {},
+          }),
+        }
+      );
+
+      // process the success response
+      if (response.status === 200) {
+        const data = await response.json();
+        console.log("### Simple query successful:", data.customer);
+      }
     } catch (testError) {
-      console.log("### Introspection failed:", testError);
+      console.log("### Simple query failed:", testError);
     }
 
-    const query = `
-      query GetCustomer {
-        customer {
-          id
-          email
-          firstName
-          lastName
-          phone
-          createdAt
-          updatedAt
-        }
-      }
-    `;
+    // const query = `
+    //   query GetCustomer {
+    //     customer {
+    //       id
+    //       email
+    //       firstName
+    //       lastName
+    //       phone
+    //       createdAt
+    //       updatedAt
+    //     }
+    //   }
+    // `;
 
-    const response = await authenticatedClient.request<{ customer: Customer }>(
-      query
-    );
-    return response.customer;
+    // const response = await authenticatedClient.request<{ customer: Customer }>(
+    //   query
+    // );
+    // return response.customer;
+    return null;
   } catch (error) {
     console.error("Error fetching customer:", error);
 
@@ -285,6 +283,9 @@ export async function exchangeCodeForToken2(code: string): Promise<any> {
     body,
   })
     .then((response) => {
+      if (response.ok) {
+        console.info("### getToken response:", response);
+      }
       if (!response.ok) {
         console.error("### getToken response:", response);
         throw new Error("Token response was not ok");
@@ -352,10 +353,9 @@ export function getLoginUrl() {
   return authUrl.toString();
 }
 
-export async function getLogoutUrl() {
+export async function getLogoutUrl(id_token: string) {
   console.log("### Getting Logout URL...");
   const logoutUrl = new URL(SERVER_CUSTOMER_CONFIG.authUrls.logout);
-  const id_token = (await cookies()).get("id_token")?.value;
   const redirectUrl = `${getAppUrl({
     inAuthFlow: true,
   })}`; // return to home page
@@ -366,11 +366,7 @@ export async function getLogoutUrl() {
 
 export const cleanAllAuthCookies = async () => {
   console.log("### Cleaning all auth cookies...");
-  const cookiesToClear = [
-    "shopify_customer_token",
-    "id_token",
-    "refresh_token",
-  ];
+  const cookiesToClear = ["access_token", "id_token", "refresh_token"];
   for (const cookieName of cookiesToClear) {
     (await cookies()).set(cookieName, "", { maxAge: -1 });
     // (await cookies()).delete(cookieName);
