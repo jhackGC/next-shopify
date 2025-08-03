@@ -42,11 +42,11 @@ export const getAppUrl = ({ inAuthFlow }: { inAuthFlow: boolean }) => {
   // If we are in dev and we are using the auth flows, we return the proxied app URL
   // Check if we have an explicit APP_URL set
   if (inDev && inAuthFlow) {
-    return process.env.PROXIED_LOCALHOST_APP_URL;
+    return process.env.PROXIED_LOCALHOST_APP_URL || "N/A";
   }
 
   // Fallback to localhost for local development
-  return process.env.APP_URL || "http://localhost:3000";
+  return process.env.APP_URL ? process.env.APP_URL : "http://localhost:3000";
 };
 
 // validate required environment variables
@@ -91,16 +91,12 @@ export const SERVER_CUSTOMER_CONFIG = {
 export async function getCustomerFromSession(): Promise<Customer | null> {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access_token")?.value;
-  console.log("### Access Token:", accessToken?.substring(0, 20) + "...");
-  console.log("### Access Token:", accessToken);
 
   if (!accessToken) {
     return null;
   }
 
   try {
-    // simple query
-    console.log("### Testing authentication with simple query...");
     const customerAccountClient = await getCustomerAccountClient();
 
     const query = `
@@ -117,7 +113,6 @@ export async function getCustomerFromSession(): Promise<Customer | null> {
       customer: Customer;
     }>(query);
 
-    console.log("### Customer fetched successfully:", response.customer);
     return response.customer;
   } catch (error) {
     console.error("Error fetching customer:", error);
@@ -133,50 +128,50 @@ export async function getCustomerFromSession(): Promise<Customer | null> {
 }
 
 // Exchange authorization code for access token (server-side)
-export async function exchangeCodeForToken(code: string) {
-  console.log("### Exchange Code for Token:", code);
+// export async function exchangeCodeForToken(code: string) {
+//   console.log("### Exchange Code for Token:", code);
 
-  try {
-    const body = new URLSearchParams({
-      grant_type: "authorization_code",
-      client_id: SERVER_CUSTOMER_CONFIG.clientId,
-      client_secret: SERVER_CUSTOMER_CONFIG.clientSecret,
-      code,
-      //   redirect_uri: SERVER_CUSTOMER_CONFIG.signInCallbackRedirectUri, // do we need this?
-    });
+//   try {
+//     const body = new URLSearchParams({
+//       grant_type: "authorization_code",
+//       client_id: SERVER_CUSTOMER_CONFIG.clientId,
+//       client_secret: SERVER_CUSTOMER_CONFIG.clientSecret,
+//       code,
+//       //   redirect_uri: SERVER_CUSTOMER_CONFIG.signInCallbackRedirectUri, // do we need this?
+//     });
 
-    console.log("### Exchange Code for Token body:", body);
+//     console.log("### Exchange Code for Token body:", body);
 
-    console.log("### Token URL:", SERVER_CUSTOMER_CONFIG.authUrls.token);
+//     console.log("### Token URL:", SERVER_CUSTOMER_CONFIG.authUrls.token);
 
-    const tokenResponse = await fetch(SERVER_CUSTOMER_CONFIG.authUrls.token, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body,
-    });
+//     const tokenResponse = await fetch(SERVER_CUSTOMER_CONFIG.authUrls.token, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/x-www-form-urlencoded",
+//       },
+//       body,
+//     });
 
-    console.log("### Token Response Status:", tokenResponse.status);
+//     console.log("### Token Response Status:", tokenResponse.status);
 
-    if (!tokenResponse.ok) {
-      const errorText = await tokenResponse.text();
-      console.log("### Token Error Response:", errorText);
-      throw new Error(
-        `Failed to exchange code for token: ${tokenResponse.status} - ${errorText}`
-      );
-    }
+//     if (!tokenResponse.ok) {
+//       const errorText = await tokenResponse.text();
+//       console.log("### Token Error Response:", errorText);
+//       throw new Error(
+//         `Failed to exchange code for token: ${tokenResponse.status} - ${errorText}`
+//       );
+//     }
 
-    console.log("### Token Response OK");
-    const tokenData = await tokenResponse.json();
-    console.log("### Token Data:", tokenData);
+//     console.log("### Token Response OK");
+//     const tokenData = await tokenResponse.json();
+//     console.log("### Token Data:", tokenData);
 
-    return tokenData;
-  } catch (error) {
-    console.error("Error exchanging code for token:", error);
-    throw error;
-  }
-}
+//     return tokenData;
+//   } catch (error) {
+//     console.error("Error exchanging code for token:", error);
+//     throw error;
+//   }
+// }
 
 // Confidential Client
 // see https://shopify.dev/docs/api/customer#authorization
@@ -215,7 +210,7 @@ export async function exchangeCodeForToken(code: string) {
  * @param code - The authorization code received from the authorization server.
  * @returns
  */
-export async function exchangeCodeForToken2(code: string): Promise<any> {
+export async function exchangeCodeForToken(code: string): Promise<any> {
   const body = new URLSearchParams();
 
   const clientId = process.env.SHOPIFY_CUSTOMER_ACCOUNT_API_CLIENT_ID;
@@ -252,57 +247,53 @@ export async function exchangeCodeForToken2(code: string): Promise<any> {
     body,
   })
     .then((response) => {
-      if (response.ok) {
-        console.info("### getToken response:", response);
-      }
       if (!response.ok) {
-        console.error("### getToken response:", response);
         throw new Error("Token response was not ok");
       }
       return response.json();
     })
     .catch((error) => {
-      console.error("### getToken error:", error);
+      console.error("### getToken error");
     });
 
   return response as TokenReturn;
 }
 
 // Generate PKCE challenge (server-side)
-export async function generatePKCEChallenge() {
-  const codeVerifier = generateRandomString(128);
-  const codeChallenge = await base64URLEncode(await sha256(codeVerifier));
+// export async function generatePKCEChallenge() {
+//   const codeVerifier = generateRandomString(128);
+//   const codeChallenge = await base64URLEncode(await sha256(codeVerifier));
 
-  return {
-    codeVerifier,
-    codeChallenge,
-    codeChallengeMethod: "S256",
-  };
-}
+//   return {
+//     codeVerifier,
+//     codeChallenge,
+//     codeChallengeMethod: "S256",
+//   };
+// }
 
 // Helper functions
-function generateRandomString(length: number): string {
-  const charset =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += charset.charAt(Math.floor(Math.random() * charset.length));
-  }
-  return result;
-}
+// function generateRandomString(length: number): string {
+//   const charset =
+//     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+//   let result = "";
+//   for (let i = 0; i < length; i++) {
+//     result += charset.charAt(Math.floor(Math.random() * charset.length));
+//   }
+//   return result;
+// }
 
-async function sha256(plain: string): Promise<ArrayBuffer> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(plain);
-  return await crypto.subtle.digest("SHA-256", data);
-}
+// async function sha256(plain: string): Promise<ArrayBuffer> {
+//   const encoder = new TextEncoder();
+//   const data = encoder.encode(plain);
+//   return await crypto.subtle.digest("SHA-256", data);
+// }
 
-async function base64URLEncode(buffer: ArrayBuffer): Promise<string> {
-  const bytes = new Uint8Array(buffer);
-  let string = "";
-  bytes.forEach((byte) => (string += String.fromCharCode(byte)));
-  return btoa(string).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
-}
+// async function base64URLEncode(buffer: ArrayBuffer): Promise<string> {
+//   const bytes = new Uint8Array(buffer);
+//   let string = "";
+//   bytes.forEach((byte) => (string += String.fromCharCode(byte)));
+//   return btoa(string).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+// }
 
 export function getLoginUrl() {
   // Build authorization URL (no PKCE needed for confidential clients)
@@ -341,3 +332,21 @@ export const cleanAllAuthCookies = async () => {
     // (await cookies()).delete(cookieName);
   }
 };
+
+export async function setSecureCookie({
+  cookieName,
+  cookieValue,
+  expirationTime = 300,
+}: {
+  cookieName: string;
+  cookieValue: any;
+  expirationTime?: number; // default to 5 minutes
+}) {
+  (await cookies()).set(cookieName, cookieValue, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    maxAge: expirationTime,
+    path: "/",
+  });
+}

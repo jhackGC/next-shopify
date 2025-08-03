@@ -29,6 +29,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await fetch("/api/auth/me");
       const data = await response.json();
 
+      console.log("### Auth status response:", data);
+
       setIsAuthenticated(data.authenticated);
       setCustomer(data.customer);
     } catch (error) {

@@ -1,6 +1,10 @@
-import { exchangeCodeForToken2, getAppUrl } from "@/lib/server-customer-api";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import {
+  exchangeCodeForToken,
+  getAppUrl,
+  setSecureCookie,
+} from "../../../../lib/server-shopify-customer-api";
 
 /**
  * Any auth flow has to be tested using the proxied app domain (ngrok), because those are the only
@@ -27,47 +31,51 @@ export async function GET(request: NextRequest) {
     }
 
     // Exchange code for token (no code verifier needed for confidential clients)
-    const tokenData = await exchangeCodeForToken2(code);
+    const tokenData = await exchangeCodeForToken(code);
     console.log("### Auth Callback - tokenData:", tokenData);
 
+    // Validate that we have the required tokens
+    if (!tokenData.access_token || !tokenData.id_token) {
+      console.error("### Missing required tokens:", {
+        hasAccessToken: !!tokenData.access_token,
+        hasIdToken: !!tokenData.id_token,
+      });
+      return NextResponse.redirect(`${appUrl}?error=invalid_tokens`);
+    }
+
+    // Store tokens with appropriate expiration times
     // Store access token in secure cookie
-    const cookieStore = await cookies();
     console.log(
       "### Setting cookie with token:",
       tokenData.access_token ? "TOKEN_EXISTS" : "NO_TOKEN"
     );
 
-    // Set cookie with appropriate settings
-    cookieStore.set("access_token", tokenData.access_token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: "/", // Ensure cookie is available site-wide
+    // Access token - expirationTime 1 hour
+    setSecureCookie({
+      cookieName: "access_token",
+      cookieValue: tokenData.access_token,
+      expirationTime: 60 * 60, // 1 hour
     });
-
-    cookieStore.set("id_token", tokenData.id_token, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: true,
-      path: "/",
-      maxAge: tokenData.expires_in,
-    });
-
-    cookieStore.set("refresh_token", tokenData.refresh_token, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: true,
-      path: "/",
-      maxAge: tokenData.expires_in,
-    });
-
     // Verify cookie was set
-    const savedToken = cookieStore.get("access_token")?.value;
+    const savedToken = (await cookies()).get("access_token")?.value;
     console.log(
       "### Cookie verification:",
       savedToken ? "COOKIE_SET" : "COOKIE_NOT_SET"
     );
+
+    // ID token - expirationTime same as access token (needed for logout)
+    setSecureCookie({
+      cookieName: "id_token",
+      cookieValue: tokenData.id_token,
+      expirationTime: 60 * 60, // 1 hour, same as access token
+    });
+
+    // Refresh token - longer lived (7 days)
+    setSecureCookie({
+      cookieName: "refresh_token",
+      cookieValue: tokenData.refresh_token,
+      expirationTime: 7 * 24 * 60 * 60, // 7 days
+    });
 
     const redirectUrl = `${appUrl}/account`;
     console.log("### Redirecting to:", redirectUrl);

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getLoginUrl } from "../../../../lib/server-customer-api";
+import { getLoginUrl } from "../../../../lib/server-shopify-customer-api";
 
 export async function GET() {
   try {

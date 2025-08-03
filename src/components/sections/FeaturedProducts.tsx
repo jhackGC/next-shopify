@@ -1,57 +1,21 @@
-"use client";
-
 import { ProductCard } from "@/components/product/ProductCard";
-import { ProductGridSkeleton } from "@/components/ui/LoadingSkeleton";
-import { fetchProducts } from "@/lib/server-proxied-shopify";
-import type { Product } from "@/types/shopify";
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import { getCollectionProducts } from "../../lib/shopify-storefront/server-shopify-storefront-api";
 
-export function FeaturedProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default async function FeaturedProducts() {
+  const products = await getCollectionProducts("buy-now");
+  console.log("Featured Products:", products);
 
-  useEffect(() => {
-    const fetchProductsData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const products = await fetchProducts({
-          first: 8,
-          sortKey: "BEST_SELLING",
-        });
-
-        setProducts(products);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        setError(
-          error instanceof Error ? error.message : "Failed to load products"
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProductsData();
-  }, []);
-
-  if (error) {
+  if (products.length === 0) {
     return (
       <section className="py-16 bg-gray-50">
-        <div className="container">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">
               Featured Products
             </h2>
-            <p className="text-red-600">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-            >
-              Try Again
-            </button>
+            <p className="text-gray-600">
+              No products available at the moment.
+            </p>
           </div>
         </div>
       </section>
@@ -60,61 +24,30 @@ export function FeaturedProducts() {
 
   return (
     <section className="py-16 bg-gray-50">
-      <div className="container">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             Featured Products
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Discover our handpicked selection of premium products, carefully
-            chosen for their quality, style, and value.
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Discover our handpicked selection of premium products
           </p>
         </div>
 
-        {isLoading ? (
-          <ProductGridSkeleton />
-        ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
 
-            {products.length === 0 && (
-              <div className="text-center py-12">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  No products found
-                </h3>
-                <p className="text-gray-600">
-                  Check back later for new arrivals!
-                </p>
-              </div>
-            )}
-
-            <div className="text-center">
-              <Link
-                href={"/products" as any}
-                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-              >
-                View All Products
-                <svg
-                  className="ml-2 -mr-1 w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </Link>
-            </div>
-          </>
-        )}
+        <div className="text-center mt-12">
+          <a
+            href="/products"
+            className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition duration-150 ease-in-out"
+          >
+            View All Products
+          </a>
+        </div>
       </div>
     </section>
   );

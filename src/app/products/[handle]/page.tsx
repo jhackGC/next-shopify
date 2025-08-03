@@ -1,9 +1,9 @@
 import { AddToCartButton } from "@/components/product/AddToCartButton";
-import { getProductByHandle } from "@/lib/server-shopify";
 import { formatMoney } from "@/lib/utils";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { getProductByHandle } from "../../../lib/shopify-storefront/server-shopify-storefront-api";
 
 interface ProductPageProps {
   params: Promise<{
@@ -43,47 +43,53 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
+  console.log("### Product data:", product);
+
   const firstVariant = product.variants.edges[0]?.node;
   const hasMultipleVariants = product.variants.edges.length > 1;
+
+  const showProductImages = false; // fix css
 
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="lg:grid lg:grid-cols-2 lg:gap-8">
           {/* Product Images */}
-          <div className="mb-8 lg:mb-0">
-            <div className="aspect-w-1 aspect-h-1 w-full">
-              {product.featuredImage ? (
-                <Image
-                  src={product.featuredImage.url}
-                  alt={product.featuredImage.altText || product.title}
-                  fill
-                  className="object-cover object-center rounded-lg"
-                  priority
-                />
-              ) : (
-                <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-500">No image available</span>
+          {showProductImages && (
+            <div className="mb-8 lg:mb-0">
+              <div className="aspect-w-1 aspect-h-1 w-full">
+                {product.featuredImage ? (
+                  <Image
+                    src={product.featuredImage.url}
+                    alt={product.featuredImage.altText || product.title}
+                    fill
+                    className="object-cover object-center rounded-lg"
+                    priority
+                  />
+                ) : (
+                  <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <span className="text-gray-500">No image available</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Additional Images */}
+              {product.images.edges.length > 1 && (
+                <div className="mt-4 grid grid-cols-4 gap-4">
+                  {product.images.edges.slice(1, 5).map((edge) => (
+                    <div key={edge.node.id} className="aspect-w-1 aspect-h-1">
+                      <Image
+                        src={edge.node.url}
+                        alt={edge.node.altText || product.title}
+                        fill
+                        className="object-cover object-center rounded-lg"
+                      />
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
-
-            {/* Additional Images */}
-            {product.images.edges.length > 1 && (
-              <div className="mt-4 grid grid-cols-4 gap-4">
-                {product.images.edges.slice(1, 5).map((edge) => (
-                  <div key={edge.node.id} className="aspect-w-1 aspect-h-1">
-                    <Image
-                      src={edge.node.url}
-                      alt={edge.node.altText || product.title}
-                      fill
-                      className="object-cover object-center rounded-lg"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          )}
 
           {/* Product Info */}
           <div className="flex flex-col">

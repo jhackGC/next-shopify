@@ -12,7 +12,7 @@ export function Header() {
   const { totalQuantity } = useCart();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  console.log("### Header - Customer:", customer);
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -87,6 +87,11 @@ export function Header() {
               {/* Authentication */}
               {isAuthenticated ? (
                 <div className="relative group">
+                  <div>
+                    Hello!{" "}
+                    {customer?.firstName ||
+                      customer?.emailAddress?.emailAddress}
+                  </div>
                   <button
                     type="button"
                     className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
@@ -105,7 +110,9 @@ export function Header() {
                       />
                     </svg>
                     <span className="hidden sm:block">
-                      {customer?.firstName || "Account"}
+                      {customer?.firstName ||
+                        customer?.emailAddress?.emailAddress ||
+                        "Account 2"}
                     </span>
                   </button>
 

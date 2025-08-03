@@ -2,19 +2,21 @@ import { Collection, Product } from "@/types/shopify";
 import { GraphQLClient } from "graphql-request";
 
 // Server-side Shopify client using public token (private token has auth issues)
-const serverShopifyClient = new GraphQLClient(
-  `https://${process.env.SHOPIFY_STORE_DOMAIN}/api/2025-01/graphql.json`,
-  {
-    headers: {
-      "X-Shopify-Storefront-Access-Token":
-        process.env.SHOPIFY_STOREFRONT_PUBLIC_ACCESS_TOKEN!,
-      "Content-Type": "application/json",
-    },
-  }
-);
+const getStorefrontClient = () => {
+  return new GraphQLClient(
+    `https://${process.env.SHOPIFY_STORE_DOMAIN}/api/2025-07/graphql.json`,
+    {
+      headers: {
+        "X-Shopify-Storefront-Access-Token":
+          process.env.SHOPIFY_STOREFRONT_PUBLIC_ACCESS_TOKEN!,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+};
 
 // Export the client for use in API routes
-export const storefrontClient = serverShopifyClient;
+export const storefrontClient = getStorefrontClient();
 
 // GraphQL Queries
 const GET_PRODUCTS_QUERY = `
@@ -121,7 +123,7 @@ const GET_COLLECTIONS_QUERY = `
             width
             height
           }
-          products(first: 8) {
+          products(first: 200) {
             edges {
               node {
                 id
@@ -154,7 +156,7 @@ export async function getFeaturedProducts(
   count: number = 8
 ): Promise<Product[]> {
   try {
-    const response = await serverShopifyClient.request<{
+    const response = await getStorefrontClient().request<{
       products: {
         edges: Array<{
           node: Product;
@@ -173,7 +175,7 @@ export async function getFeaturedCollections(
   count: number = 6
 ): Promise<Collection[]> {
   try {
-    const response = await serverShopifyClient.request<{
+    const response = await getStorefrontClient().request<{
       collections: {
         edges: Array<{
           node: Collection;
@@ -184,6 +186,72 @@ export async function getFeaturedCollections(
     return response.collections.edges.map((edge) => edge.node);
   } catch (error) {
     console.error("Error fetching collections:", error);
+    return [];
+  }
+}
+
+// Get products from a specific collection
+export async function getCollectionProducts(
+  handle: string,
+  first: number = 30
+): Promise<Product[]> {
+  try {
+    // const query = `
+    //   query GetCollectionProducts($handle: String!) {
+    //     collection(handle: $handle) {
+    //       id
+    //       title
+    //       products(first: 20) {
+    //         edges {
+    //           node {
+    //             id
+    //             title
+    //             handle
+    //             featuredImage {
+    //               id
+    //               url
+    //               altText
+    //               width
+    //               height
+    //             }
+    //             priceRange {
+    //               minVariantPrice {
+    //                 amount
+    //                 currencyCode
+    //               }
+    //             }
+    //           }
+    //         }
+    //       }
+    //     }
+    //   }
+    // `;
+
+    const query = `
+      query GetCollectionProducts($handle: String!) {
+        collection(handle: $handle) {
+          id
+          title
+          products(first: 20) {
+            edges {
+              node {
+                id
+                title
+                handle
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const response = await getStorefrontClient().request<{
+      collection: Collection | null;
+    }>(query, { handle, first });
+
+    return response.collection?.products.edges.map((edge) => edge.node) || [];
+  } catch (error) {
+    console.error("Error fetching collection products:", error);
     return [];
   }
 }
@@ -277,7 +345,7 @@ export async function getProductByHandle(
       }
     `;
 
-    const response = await serverShopifyClient.request<{
+    const response = await getStorefrontClient().request<{
       product: Product | null;
     }>(query, { handle });
 
@@ -359,7 +427,7 @@ export async function getCollectionByHandle(
       }
     `;
 
-    const response = await serverShopifyClient.request<{
+    const response = await getStorefrontClient().request<{
       collection: Collection | null;
     }>(query, { handle });
 

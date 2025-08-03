@@ -1,129 +1,124 @@
-"use client";
-
-import { CollectionGridSkeleton } from "@/components/ui/LoadingSkeleton";
-import { fetchCollections } from "@/lib/server-proxied-shopify";
-import { getCollectionUrl } from "@/lib/utils";
-import type { Collection } from "@/types/shopify";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { getFeaturedCollections } from "../../lib/shopify-storefront/server-shopify-storefront-api";
 
-export function FeaturedCollections() {
-  const [collections, setCollections] = useState<Collection[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchCollectionsData() {
-      try {
-        const collections = await fetchCollections({ first: 6 }); // Get 6 featured collections
-        setCollections(collections);
-      } catch (err) {
-        setError("Failed to load collections");
-        console.error("Error fetching collections:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchCollectionsData();
-  }, []);
-
-  if (loading) {
-    return <CollectionGridSkeleton count={6} />;
+// Helper function to format price
+function formatPrice(amount: number, currencyCode: string): string {
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currencyCode,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch (error) {
+    return `${currencyCode} ${amount.toFixed(2)}`;
   }
+}
 
-  if (error) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-gray-600">{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="mt-4 btn btn-primary"
-        >
-          Try Again
-        </button>
-      </div>
-    );
-  }
+export default async function FeaturedCollections() {
+  const collections = await getFeaturedCollections(6);
 
   if (collections.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-600">No collections found.</p>
-      </div>
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">
+              Shop by Collection
+            </h2>
+            <p className="text-gray-600">
+              No collections available at the moment.
+            </p>
+          </div>
+        </div>
+      </section>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {collections.map((collection) => (
-        <Link
-          key={collection.id}
-          href={getCollectionUrl(collection.handle)}
-          className="group card overflow-hidden hover:shadow-lg transition-shadow"
-        >
-          {/* Collection Image */}
-          <div className="aspect-square relative overflow-hidden bg-gray-100">
-            {collection.image ? (
-              <Image
-                src={collection.image.url}
-                alt={collection.image.altText || collection.title}
-                fill
-                className="image-optimize"
-                sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                <svg
-                  className="w-16 h-16 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1}
-                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+    <section className="py-16 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Shop by Collection
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Explore our curated collections to find exactly what you're looking
+            for
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {collections.map((collection) => (
+            <Link
+              key={collection.id}
+              href={`/collections/${collection.handle}`}
+              className="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
+            >
+              <div className="aspect-w-16 aspect-h-12 bg-gray-200">
+                {collection.image ? (
+                  <Image
+                    src={collection.image.url}
+                    alt={collection.image.altText || collection.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                </svg>
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                    <span className="text-gray-500 text-sm">No image</span>
+                  </div>
+                )}
               </div>
-            )}
 
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity" />
-          </div>
+              <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-opacity duration-300" />
 
-          {/* Collection Info */}
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-              {collection.title}
-            </h3>
-            {collection.description && (
-              <p className="mt-2 text-sm text-gray-600 line-clamp-2">
-                {collection.description}
-              </p>
-            )}
-            <div className="mt-4 inline-flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-500">
-              Shop Collection
-              <svg
-                className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </div>
-          </div>
-        </Link>
-      ))}
-    </div>
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <h3 className="text-xl font-bold mb-2 group-hover:text-blue-200 transition-colors">
+                  {collection.title}
+                </h3>
+                {collection.description && (
+                  <p className="text-sm opacity-90 line-clamp-2">
+                    {collection.description}
+                  </p>
+                )}
+
+                {collection.products?.edges &&
+                  collection.products.edges.length > 0 && (
+                    <div className="mt-3 flex items-center justify-between">
+                      <span className="text-sm opacity-75">
+                        {collection.products.edges.length} products
+                      </span>
+                      {collection.products.edges[0]?.node?.priceRange
+                        ?.minVariantPrice && (
+                        <span className="text-sm font-medium">
+                          From{" "}
+                          {formatPrice(
+                            parseFloat(
+                              collection.products.edges[0].node.priceRange
+                                .minVariantPrice.amount
+                            ),
+                            collection.products.edges[0].node.priceRange
+                              .minVariantPrice.currencyCode
+                          )}
+                        </span>
+                      )}
+                    </div>
+                  )}
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <div className="text-center mt-12">
+          <Link
+            href="/collections"
+            className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition duration-150 ease-in-out"
+          >
+            View All Collections
+          </Link>
+        </div>
+      </div>
+    </section>
   );
 }

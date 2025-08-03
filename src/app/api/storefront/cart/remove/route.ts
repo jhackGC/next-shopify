@@ -1,7 +1,7 @@
 import { REMOVE_FROM_CART } from "@/lib/queries";
-import { storefrontClient } from "@/lib/server-shopify";
 import type { Cart } from "@/types/shopify";
 import { NextRequest, NextResponse } from "next/server";
+import { storefrontClient } from "../../../../../lib/shopify-storefront/server-shopify-storefront-api";
 
 interface RemoveFromCartResponse {
   cartLinesRemove: {

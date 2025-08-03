@@ -143,16 +143,44 @@ export interface CartLineUpdateInput {
   quantity: number;
 }
 
+// Customer Account API Types
+export interface CustomerEmailAddress {
+  emailAddress?: string;
+  marketingState: EmailMarketingState;
+}
+
+export interface CustomerPhoneNumber {
+  phoneNumber: string;
+  marketingState: SmsMarketingState;
+}
+
+export enum EmailMarketingState {
+  SUBSCRIBED = "SUBSCRIBED",
+  UNSUBSCRIBED = "UNSUBSCRIBED",
+  NOT_SUBSCRIBED = "NOT_SUBSCRIBED",
+  PENDING = "PENDING",
+  REDACTED = "REDACTED",
+}
+
+export enum SmsMarketingState {
+  SUBSCRIBED = "SUBSCRIBED",
+  UNSUBSCRIBED = "UNSUBSCRIBED",
+  NOT_SUBSCRIBED = "NOT_SUBSCRIBED",
+  PENDING = "PENDING",
+  REDACTED = "REDACTED",
+}
+
 // Customer Types (using new Customer Account API)
 export interface Customer {
   id: string;
-  email: string;
+  emailAddress?: CustomerEmailAddress;
   firstName?: string;
   lastName?: string;
   displayName: string;
-  phone?: string;
-  createdAt: string;
-  updatedAt: string;
+  phoneNumber?: CustomerPhoneNumber;
+  creationDate: string; // Note: this is creationDate, not createdAt in Customer Account API
+  imageUrl: string;
+  tags: string[];
   defaultAddress?: CustomerAddress;
   addresses: {
     edges: Array<{
@@ -164,6 +192,19 @@ export interface Customer {
       node: Order;
     }>;
   };
+}
+
+// Simplified Customer interface for easier use in your app
+export interface SimpleCustomer {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  displayName: string;
+  phone?: string;
+  createdAt: string;
+  imageUrl?: string;
+  tags?: string[];
 }
 
 export interface CustomerAddress {
@@ -293,4 +334,19 @@ export interface ShopifyError {
 export interface FormError {
   field: string;
   message: string;
+}
+
+// Utility function to convert Customer Account API response to simplified format
+export function toSimpleCustomer(customer: Customer): SimpleCustomer {
+  return {
+    id: customer.id,
+    email: customer.emailAddress?.emailAddress || "",
+    firstName: customer.firstName,
+    lastName: customer.lastName,
+    displayName: customer.displayName,
+    phone: customer.phoneNumber?.phoneNumber,
+    createdAt: customer.creationDate,
+    imageUrl: customer.imageUrl,
+    tags: customer.tags,
+  };
 }

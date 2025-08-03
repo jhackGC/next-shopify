@@ -1,5 +1,5 @@
-import FeaturedCollectionsServer from "@/components/sections/FeaturedCollectionsServer";
-import FeaturedProductsServer from "@/components/sections/FeaturedProductsServer";
+import FeaturedCollections from "@/components/sections/FeaturedCollections";
+import FeaturedProducts from "@/components/sections/FeaturedProducts";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { Newsletter } from "@/components/sections/Newsletter";
 import { Suspense } from "react";
@@ -58,12 +58,12 @@ export default function HomePage() {
 
       {/* Featured Products - Server Side Rendered */}
       <Suspense fallback={<ProductsLoading />}>
-        <FeaturedProductsServer />
+        <FeaturedProducts />
       </Suspense>
 
       {/* Featured Collections - Server Side Rendered */}
       <Suspense fallback={<CollectionsLoading />}>
-        <FeaturedCollectionsServer />
+        <FeaturedCollections />
       </Suspense>
 
       {/* Newsletter Signup */}

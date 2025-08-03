@@ -4,8 +4,8 @@ The application now follows this pattern:
 
 ```
 Server Components (Data Fetching)
-├── FeaturedProductsServer.tsx        // Fetches products server-side
-├── FeaturedCollectionsServer.tsx     // Fetches collections server-side
+├── FeaturedProducts.tsx        // Fetches products server-side
+├── FeaturedCollections.tsx     // Fetches collections server-side
 ├── ProductPage ([handle]/page.tsx)   // Fetches single product server-side
 └── CollectionPage ([handle]/page.tsx) // Fetches collection products server-side
 
@@ -52,8 +52,8 @@ The application follows this pattern:
 
 ```
 Server Components (Data Fetching)
-├── FeaturedProductsServer.tsx        // Fetches products server-side
-├── FeaturedCollectionsServer.tsx     // Fetches collections server-side
+├── FeaturedProducts.tsx        // Fetches products server-side
+├── FeaturedCollections.tsx     // Fetches collections server-side
 ├── ProductPage ([handle]/page.tsx)   // Fetches single product server-side
 └── CollectionPage ([handle]/page.tsx) // Fetches collection products server-side
 
@@ -95,13 +95,13 @@ export async function getCollectionByHandle(
 
 #### 2. Server Components
 
-**FeaturedProductsServer Component:**
+**FeaturedProducts Component:**
 
 - Fetches best-selling products server-side
 - Renders immediately without client-side loading states
 - Includes comprehensive product data for SEO
 
-**FeaturedCollectionsServer Component:**
+**FeaturedCollections Component:**
 
 - Fetches collections with preview products
 - Server-side rendering for better performance
@@ -152,7 +152,7 @@ The application uses React Suspense to provide smooth loading experiences:
 
 ```typescript
 <Suspense fallback={<ProductsLoading />}>
-  <FeaturedProductsServer />
+  <FeaturedProducts />
 </Suspense>
 ```
 

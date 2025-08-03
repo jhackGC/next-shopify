@@ -1,7 +1,7 @@
 import { GET_PRODUCTS } from "@/lib/queries";
-import { storefrontClient } from "@/lib/server-shopify";
 import type { Product } from "@/types/shopify";
 import { NextRequest, NextResponse } from "next/server";
+import { storefrontClient } from "../../../../lib/shopify-storefront/server-shopify-storefront-api";
 
 interface ProductsResponse {
   products: {
